@@ -1,68 +1,93 @@
 package structure
 
-type LRUNode struct {
-	prev, nxt *LRUNode
-	key, val  int
+type LRUCache struct {
+	capacity int
+	size     int
+	cache    map[int]*LRUNode
+	head     *LRUNode
+	tail     *LRUNode
 }
 
-type LRUCache struct {
-	head, tail *LRUNode
-	m          map[int]*LRUNode
-	c          int
+type LRUNode struct {
+	key   int
+	value int
+	prev  *LRUNode
+	next  *LRUNode
 }
 
 // func Constructor(capacity int) LRUCache {
-// 	head := &Node{
-// 		key: 0,
-// 		val: 0,
-// 	}
-// 	tail := &Node{
-// 		key: 0,
-// 		val: 0,
-// 	}
-// 	head.nxt = tail
-// 	tail.prev = head
+// 	head, tail := new(LRUNode), new(LRUNode)
 // 	return LRUCache{
-// 		head: head,
-// 		tail: tail,
-// 		m:    make(map[int]*Node),
-// 		c:    capacity,
+// 		capacity: capacity,
+// 		size:     0,
+// 		cache:    make(map[int]*LRUNode),
+// 		head:     head,
+// 		tail:     tail,
 // 	}
 // }
 
 func (this *LRUCache) Get(key int) int {
-	if node, ok := this.m[key]; ok {
-		this.remove(node)
-		this.Insert(node)
-		return node.key
+	if LRUNode, exists := this.cache[key]; exists {
+		this.moveToHead(LRUNode)
+		return LRUNode.value
 	}
 	return -1
 }
 
 func (this *LRUCache) Put(key int, value int) {
-	if node, ok := this.m[key]; ok {
-		this.remove(node)
+	if node, exists := this.cache[key]; exists {
+		node.value = value
+		this.moveToHead(node)
+	} else {
+		newNode := &LRUNode{
+			key:   key,
+			value: value,
+		}
+		this.cache[key] = newNode
+		this.addToHead(newNode)
+		this.size++
+		if this.size > this.capacity {
+			removed := this.removeTail()
+			delete(this.cache, removed.key)
+			this.size--
+		}
 	}
-	if this.c == len(this.m) {
-		this.remove(this.tail.prev)
-	}
-	this.Insert(&LRUNode{
-		key: key,
-		val: value,
-	})
 }
 
-func (this *LRUCache) remove(node *LRUNode) {
-	delete(this.m, node.key)
-	node.prev.nxt = node.nxt
-	node.nxt.prev = node.prev
-}
-
-func (this *LRUCache) Insert(node *LRUNode) {
-	this.m[node.key] = node
-	nxt := this.head.nxt
-	this.head.nxt = node
-	node.nxt = nxt
-	nxt.prev = node
+func (this *LRUCache) addToHead(node *LRUNode) {
 	node.prev = this.head
+	node.next = this.head.next
+	this.head.next.prev = node
+	this.head.next = node
 }
+
+func (this *LRUCache) moveToHead(node *LRUNode) {
+	node.prev.next = node.next
+	node.next.prev = node.prev
+	this.addToHead(node)
+}
+
+func (this *LRUCache) removeTail() *LRUNode {
+	node := this.tail.prev
+	node.prev.next = node.next
+	node.next.prev = node.prev
+	return node
+}
+
+// 这种会频繁更新 map, 导致创建和销毁，map 视图应该减少更新
+// func (this *LRUCache) insert(n *Node) {
+// 	this.m[n.key] = n
+// 	next := this.head.Next
+// 	this.head.Next = n
+// 	// 这个能提前
+// 	n.Next = next
+// 	n.Prev = this.head
+// 	next.Prev = n
+
+// }
+
+// func (this *LRUCache) remove(n *Node) {
+// 	delete(this.m, n.key)
+// 	n.Prev.Next = n.Next
+// 	n.Next.Prev = n.Prev
+// }

@@ -2,11 +2,11 @@ package structure
 
 type Node struct {
 	nxt *Node
-	val   int
+	val int
 }
 
 type MyLinkedList struct {
-	head, tail *LRUNode
+	head, tail *Node
 	length     int
 }
 
@@ -34,7 +34,7 @@ func (this *MyLinkedList) Get(index int) int {
 
 /** Add a node of value val before the first element of the linked list. After the insertion, the new node will be the first node of the linked list. */
 func (this *MyLinkedList) AddAtHead(val int) {
-	n := &LRUNode{
+	n := &Node{
 		val: val,
 	}
 	nxt := this.head.nxt
@@ -46,7 +46,7 @@ func (this *MyLinkedList) AddAtHead(val int) {
 /** Append a node of value val to the last element of the linked list. */
 func (this *MyLinkedList) AddAtTail(val int) {
 	this.tail.val = val
-	this.tail.nxt = new(LRUNode)
+	this.tail.nxt = new(Node)
 	this.tail = this.tail.nxt
 	this.length++
 }
@@ -66,7 +66,7 @@ func (this *MyLinkedList) AddAtIndex(index int, val int) {
 	for i := 0; i < index; i++ {
 		head = head.nxt
 	}
-	n := &LRUNode{
+	n := &Node{
 		val: val,
 	}
 	nxt := head.nxt

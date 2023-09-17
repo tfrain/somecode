@@ -28,6 +28,55 @@ func longestPalindrome(s string) string {
 	return res
 }
 
+func longestPalindrome2(s string) string {
+	if len(s) < 1 {
+		return ""
+	}
+	min := func(a, b int) int {
+		if a < b {
+			return a
+		}
+		return b
+	}
+	// 预处理字符串，使其成为一个新的字符串，每个字符间都插入一个特殊字符，例如 '#'
+	newStr := "#"
+	for _, c := range s {
+		newStr += string(c) + "#"
+	}
+
+	n := len(newStr)
+	p := make([]int, n)
+	center, right := 0, 0
+	maxLen, start := 0, 0
+
+	for i := 0; i < n; i++ {
+		if i < right {
+			p[i] = min(p[2*center-i], right-i)
+		} else {
+			p[i] = 1
+		}
+
+		// 尝试扩展回文串
+		for i+p[i] < n && i-p[i] >= 0 && newStr[i+p[i]] == newStr[i-p[i]] {
+			p[i]++
+		}
+
+		// 更新 center 和 right
+		if i+p[i]-1 > right {
+			center = i
+			right = i + p[i] - 1
+		}
+
+		// 更新最长回文串的长度和起始位置
+		if p[i]-1 > maxLen {
+			maxLen = p[i] - 1
+			start = (i - maxLen) / 2 // 转换回原始字符串的起始位置
+		}
+	}
+
+	return s[start : start+maxLen]
+}
+
 func maxProduct(nums []int) int {
 	maxV, minV, res := nums[0], nums[0], nums[0]
 	max, min := func(a, b int) int {
@@ -412,7 +461,7 @@ func trap(height []int) int {
 	maxL, maxR, res := 0, 0, 0
 	n := len(height)
 	left, right := 0, n-1
-	max := func(a, b int) int{
+	max := func(a, b int) int {
 		if a > b {
 			return a
 		}
@@ -422,10 +471,10 @@ func trap(height []int) int {
 		maxL = max(maxL, height[left])
 		maxR = max(maxR, height[right])
 		if maxL < maxR {
-			res += maxL-height[left]
+			res += maxL - height[left]
 			left++
 		} else {
-			res += maxR-height[right]
+			res += maxR - height[right]
 			right--
 		}
 	}
