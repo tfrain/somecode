@@ -1,4 +1,4 @@
-package draft
+package main
 
 type ListNode struct {
 	Val  int
@@ -16,3 +16,5 @@ type TreeNode struct {
 	Left  *TreeNode
 	Right *TreeNode
 }
+
+

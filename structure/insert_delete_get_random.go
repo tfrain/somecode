@@ -1,6 +1,8 @@
 package structure
 
-import "math/rand"
+import (
+	"math/rand"
+)
 
 type RandomizedSet struct {
 	nums       []int

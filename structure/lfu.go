@@ -32,7 +32,7 @@ func (l *LFUCache) Get(key int) int {
 }
 
 func (l *LFUCache) Put(key, value int) {
-	// 维持健壮性?
+	// 维持健壮性？
 	if l.cap <= 0 {
 		return
 	}
